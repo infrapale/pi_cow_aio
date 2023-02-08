@@ -4,6 +4,7 @@
 #define PIRPANA
 #include "secrets.h"
 #include <Adafruit_PCT2075.h>
+#include "Wire.h"
 
 // WiFi parameters
 
@@ -24,7 +25,6 @@ WiFiClient client;
 
 Adafruit_PCT2075 PCT2075;
 
-
 // Setup the MQTT client class by passing in the WiFi client and MQTT server and login details.
 Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_KEY);
 Adafruit_MQTT_Publish Temperature = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/home-tampere.sisa-temperature");
@@ -32,7 +32,7 @@ float temp = 20.0; //to store the temperature value
 
 void setup() 
 {
-    Serial.begin(115200);
+    //Serial.begin(115200);
     Serial.begin(9600);
     while (!Serial) {
       ;  // wait for serial port to connect. Needed for native USB port only
@@ -41,9 +41,11 @@ void setup()
     // Connect to WiFi access point.
     Serial.print(F("Connecting to "));
     Serial.println(WLAN_SSID);
-
+    Wire1.setSCL(7);
+    Wire1.setSDA(6);
+    Wire1.begin();
     PCT2075 = Adafruit_PCT2075();
-    if (!PCT2075.begin()) 
+    if (!PCT2075.begin(0x37,&Wire1)) 
     {
         Serial.println("Couldn't find PCT2075 chip");
         while (1);
